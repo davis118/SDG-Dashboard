@@ -22,7 +22,9 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run the script
+      - name: Run the script with API key
+        env:
+          EXPERTS_API_KEY: ${{ secrets.EXPERTS_API_KEY }}
         run: python main.py
 
       - name: Commit and Push Updated Data
