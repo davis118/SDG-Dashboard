@@ -194,7 +194,7 @@ def fetch_and_process_persons(offset, filter_uuids, output_filename, offset_file
 
             for item in items:
                 # Construct full name and extract information
-                full_name = f"{item.get("name", {}).get("firstName", "")} {item.get("name", {}).get("lastName", "")}".strip()
+                full_name = f"{item.get('name', {}).get('firstName', '')} {item.get('name', {}).get('lastName', '')}".strip()
                 organisational_units = [ou.get("organisationalUnit", {}).get("name", {}).get("text", [{}])[0].get("value", "N/A")
                                         for ou in item.get("staffOrganisationAssociations", [])
                                         if ou.get("organisationalUnit")]
