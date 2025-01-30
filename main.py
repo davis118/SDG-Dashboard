@@ -19,7 +19,7 @@ import os
 API_KEY = os.getenv("EXPERTS_API_KEY")
 
 
-def fetch_and_process_articles(offset, maxoffset, output_filename, offset_filename):
+def fetch_and_process_articles(offset, output_filename, offset_filename):
     url = "https://experts.illinois.edu/ws/api/524/research-outputs"
     headers = {
         "Accept": "application/json",
@@ -97,8 +97,8 @@ def fetch_and_process_articles(offset, maxoffset, output_filename, offset_filena
                     file.write(str(len(items) + params["offset"]))
                 break
             params["offset"] += params["size"]
-            if(params["offset"] >= maxoffset):
-                break
+            #if(params["offset"] >= maxoffset):
+            #    break
         else:
             print(f"Failed to retrieve data. Status code: {response.status_code}, Response content: {response.text}")
             break
@@ -293,13 +293,17 @@ def process_and_merge_data(people_file, articles_file, output_file):
     else:
         final_df.to_csv(output_file, sep="\t", index=False)
 
-
+offset = 0
+filename = "research_offset.txt"
+if os.path.exists(filename):
+    with open(filename, "r") as file:
+        offset = int(file.read().strip())
     
 #Import new GIES research from research-outputs with offset 0, saved to articles_final_new.tsv. store offset in research_offset.txt
-fetch_and_process_articles(0, 226000, "articles_update", "research_offset.txt")
+fetch_and_process_articles(offset, "articles_update", "research_offset.txt")
 
 #Import new persons from /persons with offset 0, saved to people.tsv. store offset in research_offset.txt
-fetch_and_process_persons(0, fetch_gies_uuids(), "people.tsv", "researcher_offset.txt")
+fetch_and_process_persons(offset, fetch_gies_uuids(), "people.tsv", "researcher_offset.txt")
 
 process_and_merge_data("people.tsv", "articles_final_update.tsv", "final_data.tsv")
 final_df = pd.read_csv("final_data.tsv", sep="\t")
