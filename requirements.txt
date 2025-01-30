@@ -1,9 +1,5 @@
 requests
-json
 pandas
-ast
 selenium
 webdriver_manager
 bs4
-time
-os
