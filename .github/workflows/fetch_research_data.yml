@@ -31,6 +31,6 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add final_data.tsv research_offset.txt researcher_offset.txt articles_final_update.tsv people.tsv
+          git add final_data.tsv research_offset.txt researcher_offset.txt
           git commit -m "Updated research data on $(date)" || echo "No changes to commit"
           git push
