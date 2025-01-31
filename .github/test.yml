@@ -1,0 +1,30 @@
+name: Create Hello World File
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * *"  # Runs daily at midnight UTC
+
+jobs:
+  create-file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create hello.txt
+        run: echo "Hello World!" > hello.txt
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Commit and Push Changes
+        run: |
+          git add hello.txt
+          git commit -m "Added hello.txt with Hello World!"
+          git push
