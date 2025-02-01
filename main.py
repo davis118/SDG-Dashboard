@@ -114,6 +114,11 @@ def fetch_and_process_articles(offset, output_filename, offset_filename):
 
     df = pd.DataFrame(all_refined_info)
 
+    if df.empty:
+        print("No new data.")
+        update = False
+        return
+
     df["title"] = df.apply(lambda row: row["title"] + ": " + row["subtitle"] if row["subtitle"] != "N/A" else row["title"], axis=1)
     df["abstract"] = df["abstract"].str.replace("^<p>", "", regex=True).str.replace("</p>$", "", regex=True)
     df.drop(columns=["subtitle"], inplace=True)
@@ -237,10 +242,7 @@ def fetch_and_process_persons(offset, filter_uuids, output_filename, offset_file
     #    data = json.load(file)
     
     df = pd.DataFrame(all_refined_info)
-    if df.empty:
-        print("No new data.")
-        update = False
-        return
+
     df["organization"] = df["organization"].apply(lambda units: list(set(units)))
     
     name_counts = {}
