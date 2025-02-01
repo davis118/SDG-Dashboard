@@ -303,7 +303,7 @@ if os.path.exists(filename):
 fetch_and_process_articles(offset, "articles_update.tsv", "research_offset.txt")
 
 #Import new persons from /persons with offset 0, saved to people.tsv. store offset in research_offset.txt
-fetch_and_process_persons(offset, fetch_gies_uuids(), "people.tsv", "researcher_offset.txt")
+fetch_and_process_persons(0, fetch_gies_uuids(), "people.tsv", "researcher_offset.txt")
 
 process_and_merge_data("people.tsv", "articles_update.tsv", "final_data.tsv")
 final_df = pd.read_csv("final_data.tsv", sep="\t")
