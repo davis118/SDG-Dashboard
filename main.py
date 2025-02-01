@@ -18,8 +18,6 @@ import os
 
 API_KEY = os.getenv("EXPERTS_API_KEY")
 
-update = True
-
 def fetch_and_process_articles(offset, output_filename, offset_filename):
     url = "https://experts.illinois.edu/ws/api/524/research-outputs"
     headers = {
@@ -55,6 +53,7 @@ def fetch_and_process_articles(offset, output_filename, offset_filename):
         if response.status_code == 200:
             data = response.json()
             items = data.get("items", [])
+            
             for item in items:
                 journal_association = item.get("journalAssociation", {})
                 journal_title = journal_association.get("title", {}).get("value", "N/A")
@@ -102,7 +101,7 @@ def fetch_and_process_articles(offset, output_filename, offset_filename):
             #    break
         else:
             print(f"Failed to retrieve data. Status code: {response.status_code}, Response content: {response.text}")
-            break
+            return False
 
     #filename = "research_data_filtered.json"
     #with open(filename, "w", encoding="utf-8") as f:
@@ -113,17 +112,19 @@ def fetch_and_process_articles(offset, output_filename, offset_filename):
     #    data = json.load(file)
 
     df = pd.DataFrame(all_refined_info)
-
+    
+    
     if df.empty:
         print("No new data.")
-        update = False
-        return
-
+        return False
+    
     df["title"] = df.apply(lambda row: row["title"] + ": " + row["subtitle"] if row["subtitle"] != "N/A" else row["title"], axis=1)
     df["abstract"] = df["abstract"].str.replace("^<p>", "", regex=True).str.replace("</p>$", "", regex=True)
     df.drop(columns=["subtitle"], inplace=True)
     #df["keywords"] = df["keywords"].apply(lambda x: ", ".join(x))
     df.to_csv(output_filename, sep="\t", index=False)
+    
+    return True
 
 def fetch_gies_uuids():
     url = "https://experts.illinois.edu/ws/api/524/organisational-units"
@@ -307,7 +308,7 @@ if os.path.exists(filename):
         offset = int(file.read().strip())
     
 #Import new GIES research from research-outputs with offset 0, saved to articles_final_new.tsv. store offset in research_offset.txt
-fetch_and_process_articles(offset, "articles_update.tsv", "research_offset.txt")
+update = fetch_and_process_articles(offset, "articles_update.tsv", "research_offset.txt")
 
 if update:
     #Import new persons from /persons with offset 0, saved to people.tsv. store offset in research_offset.txt
