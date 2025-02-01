@@ -18,6 +18,7 @@ import os
 
 API_KEY = os.getenv("EXPERTS_API_KEY")
 
+update = True
 
 def fetch_and_process_articles(offset, output_filename, offset_filename):
     url = "https://experts.illinois.edu/ws/api/524/research-outputs"
@@ -236,6 +237,10 @@ def fetch_and_process_persons(offset, filter_uuids, output_filename, offset_file
     #    data = json.load(file)
     
     df = pd.DataFrame(all_refined_info)
+    if df.empty:
+        print("No new data.")
+        update = False
+        return
     df["organization"] = df["organization"].apply(lambda units: list(set(units)))
     
     name_counts = {}
@@ -302,9 +307,10 @@ if os.path.exists(filename):
 #Import new GIES research from research-outputs with offset 0, saved to articles_final_new.tsv. store offset in research_offset.txt
 fetch_and_process_articles(offset, "articles_update.tsv", "research_offset.txt")
 
-#Import new persons from /persons with offset 0, saved to people.tsv. store offset in research_offset.txt
-fetch_and_process_persons(0, fetch_gies_uuids(), "people.tsv", "researcher_offset.txt")
+if update:
+    #Import new persons from /persons with offset 0, saved to people.tsv. store offset in research_offset.txt
+    fetch_and_process_persons(0, fetch_gies_uuids(), "people.tsv", "researcher_offset.txt")
 
-process_and_merge_data("people.tsv", "articles_update.tsv", "final_data.tsv")
-final_df = pd.read_csv("final_data.tsv", sep="\t")
-print(len(final_df))
+    process_and_merge_data("people.tsv", "articles_update.tsv", "final_data.tsv")
+    final_df = pd.read_csv("final_data.tsv", sep="\t")
+    print(len(final_df))
